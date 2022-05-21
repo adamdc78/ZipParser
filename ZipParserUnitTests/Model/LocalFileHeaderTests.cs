@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ZipParser.Model;
+using ZipParser.Utility;
 
 namespace ZipParserUnitTests.Model
 {
@@ -65,10 +66,16 @@ namespace ZipParserUnitTests.Model
       using (var memoryStream = new MemoryStream(Properties.Resources.work_sample_exercise))
       using (var binaryReader = new BinaryReader(memoryStream))
       {
+        var signature = binaryReader.ReadBytes(4);
+        Assert.IsTrue(BinaryUtilities.AreByteArraysEqual(signature, LocalFileHeader.Signature));
         success = localFileHeader.ReadFromStream(binaryReader);
       }
 
-      Assert.IsTrue(!string.IsNullOrWhiteSpace(localFileHeader.GetFilename()));
+      Assert.IsTrue(!string.IsNullOrWhiteSpace(localFileHeader.FileName));
+      Assert.AreEqual(localFileHeader.VersionNeededToExtract, 20);
+      Assert.AreEqual(localFileHeader.LastModFileTime, 22131);
+      Assert.AreEqual(localFileHeader.LastModFileDate, 21683);
+      Assert.AreEqual(localFileHeader.FileName, "folder00/");
       Assert.IsFalse(localFileHeader.HasDataDescriptor);
 
       Assert.IsTrue(success);

@@ -87,22 +87,31 @@ namespace ZipParser.Model
       }
     }
 
-    internal CentralDirectoryFileHeader(BinaryReader reader)
+    /// <summary>
+    /// Constructs an instance by invoking ReadFromStream using the binaryReader
+    /// </summary>
+    /// <param name="binaryReader">The reader used to perform ReadFromStream</param>
+    internal CentralDirectoryFileHeader(BinaryReader binaryReader)
     {
-      ReadFromStream(reader);
+      ReadFromStream(binaryReader);
     }
 
     internal CentralDirectoryFileHeader()
     {
     }
 
-    internal bool ReadFromStream(BinaryReader reader)
+    /// <summary>
+    /// Reads the record (starting after the signature) from the stream.
+    /// </summary>
+    /// <param name="binaryReader">The binary reader used to read the underlying stream</param>
+    /// <returns>true if the operation is successful</returns>
+    internal bool ReadFromStream(BinaryReader binaryReader)
     {
       var success = true;
 
       try
       {
-        var data = reader.ReadBytes(42);
+        var data = binaryReader.ReadBytes(42);
         VersionMadeBy = BitConverter.ToInt16(data, 0);
         VersionNeededToExtract = BitConverter.ToInt16(data, 2);
         GeneralPurposeBitFlag = BitConverter.ToInt16(data, 4);
@@ -128,9 +137,9 @@ namespace ZipParser.Model
         
         RelativeOffsetOfLocalHeader = BitConverter.ToInt32(data, 38);
 
-        FileName = Encoding.UTF8.GetString(reader.ReadBytes(FileNameLength));
-        ExtraField = Encoding.UTF8.GetString(reader.ReadBytes(ExtraFieldLength));
-        FileComment = Encoding.UTF8.GetString(reader.ReadBytes(FileCommentLength));
+        FileName = Encoding.UTF8.GetString(binaryReader.ReadBytes(FileNameLength));
+        ExtraField = Encoding.UTF8.GetString(binaryReader.ReadBytes(ExtraFieldLength));
+        FileComment = Encoding.UTF8.GetString(binaryReader.ReadBytes(FileCommentLength));
       }
       catch (Exception e)
       {

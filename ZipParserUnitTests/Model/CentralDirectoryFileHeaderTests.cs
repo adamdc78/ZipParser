@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ZipParser.Model;
+using ZipParser.Utility;
 
 namespace ZipParserUnitTests.Model
 {
@@ -11,9 +12,9 @@ namespace ZipParserUnitTests.Model
   /// Summary description for UnitTest1
   /// </summary>
   [TestClass]
-  public class EndOfCentralDirectoryLocatorTests
+  public class CentralDirectoryFileHeaderTests
   {
-    public EndOfCentralDirectoryLocatorTests()
+    public CentralDirectoryFileHeaderTests()
     {
       //
       // TODO: Add constructor logic here
@@ -63,17 +64,27 @@ namespace ZipParserUnitTests.Model
     [TestMethod]
     public void ReadFromStream()
     {
-      var endOfCentralDirectoryLocator = new EndOfCentralDirectoryLocator();
-      bool success = false;
       using (var memoryStream = new MemoryStream(Properties.Resources.work_sample_exercise))
       using (var binaryReader = new BinaryReader(memoryStream))
       {
-        success = endOfCentralDirectoryLocator.ReadFromStream(binaryReader);
-      }
+        var endOfCentralDirectoryRecord = new EndOfCentralDirectoryRecord(binaryReader);
 
-      // This archive doesn't have a locator record
-      // Ideally an archive which has one would be used for this test
-      Assert.IsFalse(success);
+        if (endOfCentralDirectoryRecord.DiskNumber == endOfCentralDirectoryRecord.DiskNumberWithCentralDirectory)
+        {
+          binaryReader.BaseStream.Seek(endOfCentralDirectoryRecord.OffsetOfCentralDirectoryOnStartingDisk, SeekOrigin.Begin);
+
+          var signature = binaryReader.ReadBytes(4);
+
+          Assert.IsTrue(BinaryUtilities.AreByteArraysEqual(signature, CentralDirectoryFileHeader.Signature));
+
+          var centralDirectoryFileHeader = new CentralDirectoryFileHeader(binaryReader);
+
+          Assert.AreEqual(centralDirectoryFileHeader.FileName, "folder00/");
+          Assert.AreEqual(centralDirectoryFileHeader.VersionNeededToExtract, 20);
+          Assert.AreEqual(centralDirectoryFileHeader.LastModifiedDateTime, new DateTime(637885542980000000));
+          Assert.IsTrue(centralDirectoryFileHeader.IsDirectory);
+        }
+      }
     }
   }
 }

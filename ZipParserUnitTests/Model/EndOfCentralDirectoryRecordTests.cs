@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ZipParser.Model;
+using ZipParser.Utility;
 
 namespace ZipParserUnitTests.Model
 {
