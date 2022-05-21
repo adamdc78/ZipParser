@@ -17,22 +17,27 @@ namespace ZipParser
     /// <param name="args">The only argument accepted is a path to a file</param>
     static void Main(string[] args)
     {
-      var cwd = AppContext.BaseDirectory;
       if (args.Length == 0 || args[0] == null)
-        Console.WriteLine("Usage: ZipParser.exe <path_to_zip>");
-
-      var filename = Path.Combine(cwd, args[0]);
-
-      if (!File.Exists(filename))
-        Console.WriteLine($"Unable to locate '{filename}'");
-
-      using (var fileStream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-      using (var binaryReader = new BinaryReader(fileStream))
       {
-        // My testing indicates a moderate performance increase for seeking the end of central directory record versus the full archive for this very small zip;
-        // Larger archives should see larger performance gains, although I haven't been able to pull together large archives of public-github-safe content with which to test.
-        ReadCentralDirectory(binaryReader);
-        // ReadAll(binaryReader);
+        Console.WriteLine("Usage: ZipParser.exe <path_to_zip>");
+        
+      }
+      else
+      {
+        var cwd = AppContext.BaseDirectory;
+        var filename = Path.Combine(cwd, args[0]);
+
+        if (!File.Exists(filename))
+          Console.WriteLine($"Unable to locate '{filename}'");
+
+        using (var fileStream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        using (var binaryReader = new BinaryReader(fileStream))
+        {
+          // My testing indicates a moderate performance increase for seeking the end of central directory record versus the full archive for this very small zip;
+          // Larger archives should see larger performance gains, although I haven't been able to pull together large archives of public-github-safe content with which to test.
+          ReadCentralDirectory(binaryReader);
+          // ReadAll(binaryReader);
+        }
       }
 
 #if DEBUG
