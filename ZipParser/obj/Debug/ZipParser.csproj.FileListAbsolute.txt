@@ -1,7 +1,0 @@
-X:\github\ZipParser\ZipParser\bin\Debug\ZipParser.exe.config
-X:\github\ZipParser\ZipParser\bin\Debug\ZipParser.exe
-X:\github\ZipParser\ZipParser\bin\Debug\ZipParser.pdb
-X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.csproj.SuggestedBindingRedirects.cache
-X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.csproj.CoreCompileInputs.cache
-X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.exe
-X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.pdb
