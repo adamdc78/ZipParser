@@ -10,6 +10,9 @@ using ZipParser.Utility;
 [assembly: InternalsVisibleTo("ZipparserUnitTests")]
 namespace ZipParser.Model
 {
+  /// <summary>
+  /// Not necessary for the final implementation, but was used in the naive implementation
+  /// </summary>
   internal class LocalFileHeader
   {
     internal enum Flags
@@ -57,22 +60,27 @@ namespace ZipParser.Model
       PPMdvIR1 = 98,
     }
 
-    internal byte[] Signature { get; private set; }
-    internal byte[] VersionNeededToExtract { get; private set; }
-    internal byte[] GeneralPurposeBitFlag { get; private set; }
-    internal byte[] CompressionMethod { get; private set; }
-    internal byte[] LastModFileTime { get; private set; }
-    internal byte[] LastModFileDate { get; private set; }
-    internal byte[] CRC32 { get; private set; }
-    internal byte[] CompressedSize { get; private set; }
-    internal byte[] UncompressedSize { get; private set; }
-    internal byte[] FileNameLength { get; private set; }
-    internal byte[] ExtraFieldLength { get; private set; }
-    internal byte[] FileName { get; private set; }
-    internal byte[] ExtraField { get; private set; }
+    static internal readonly byte[] Signature = BitConverter.GetBytes(0x04034b50);
 
-    internal bool HasDataDescriptor { get { return BinaryUtilities.IsBitSet(GeneralPurposeBitFlag[0], (int)Flags.DataDescriptor); } }
+    internal short VersionNeededToExtract { get; private set; }
+    internal short GeneralPurposeBitFlag { get; private set; }
+    internal short CompressionMethod { get; private set; }
+    internal short LastModFileTime { get; private set; }
+    internal short LastModFileDate { get; private set; }
+    internal int CRC32 { get; private set; }
+    internal int CompressedSize { get; private set; }
+    internal int UncompressedSize { get; private set; }
+    internal short FileNameLength { get; private set; }
+    internal short ExtraFieldLength { get; private set; }
+    internal string FileName { get; private set; }
+    internal string ExtraField { get; private set; }
 
+    internal bool HasDataDescriptor { get { return BinaryUtilities.IsBitSet(BitConverter.GetBytes(GeneralPurposeBitFlag), (int)Flags.DataDescriptor); } }
+
+    /// <summary>
+    /// Constructs an instance by invoking ReadFromStream using the binaryReader
+    /// </summary>
+    /// <param name="binaryReader">The reader used to perform ReadFromStream</param>
     internal LocalFileHeader(BinaryReader reader)
     {
       ReadFromStream(reader);
@@ -82,43 +90,42 @@ namespace ZipParser.Model
     {
     }
 
+    /// <summary>
+    /// Reads the record (starting after the signature) from the stream.
+    /// </summary>
+    /// <param name="binaryReader">The binary reader used to read the underlying stream</param>
+    /// <returns>true if the operation is successful</returns>
     internal bool ReadFromStream(BinaryReader reader)
     {
       var success = false;
 
       try
       {
-        Signature = reader.ReadBytes(4);
-        VersionNeededToExtract = reader.ReadBytes(2);
-        GeneralPurposeBitFlag = reader.ReadBytes(2);
-        CompressionMethod = reader.ReadBytes(2);
-        LastModFileTime = reader.ReadBytes(2);
-        LastModFileDate = reader.ReadBytes(2);
-        CRC32 = reader.ReadBytes(4);
-        CompressedSize = reader.ReadBytes(4);
-        UncompressedSize = reader.ReadBytes(4);
-        FileNameLength = reader.ReadBytes(2);
-        ExtraFieldLength = reader.ReadBytes(2);
+        var data = reader.ReadBytes(26);
+        VersionNeededToExtract = BitConverter.ToInt16(data, 0);
+        GeneralPurposeBitFlag = BitConverter.ToInt16(data, 2);
+        CompressionMethod = BitConverter.ToInt16(data, 4);
+        LastModFileTime = BitConverter.ToInt16(data, 6);
+        LastModFileDate = BitConverter.ToInt16(data, 8);
+        CRC32 = BitConverter.ToInt32(data, 10);
+        CompressedSize = BitConverter.ToInt32(data, 14);
+        UncompressedSize = BitConverter.ToInt32(data, 18);
+        FileNameLength = BitConverter.ToInt16(data, 22);
+        ExtraFieldLength = BitConverter.ToInt16(data, 24);
 
-        var fileNameLength = BitConverter.ToInt16(FileNameLength, 0);
-        var extraFieldLength = BitConverter.ToInt16(ExtraFieldLength, 0);
-
-        FileName = reader.ReadBytes(fileNameLength);
-        ExtraField = reader.ReadBytes(extraFieldLength);
+        FileName = Encoding.UTF8.GetString(reader.ReadBytes(FileNameLength));
+        if (ExtraFieldLength > 0)
+          ExtraField = Encoding.UTF8.GetString(reader.ReadBytes(ExtraFieldLength));
 
         success = true;
       }
       catch (Exception e)
       {
         Console.WriteLine($"Unable to read zip local file header: {e.Message}");
+        Console.WriteLine(e.StackTrace);
       }
 
       return success;
-    }
-
-    internal string GetFilename()
-    {
-      return Encoding.UTF8.GetString(FileName);
     }
   }
 }

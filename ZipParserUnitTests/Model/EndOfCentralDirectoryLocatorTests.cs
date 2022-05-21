@@ -11,10 +11,13 @@ namespace ZipParserUnitTests.Model
   /// Summary description for UnitTest1
   /// </summary>
   [TestClass]
-  public class LocalFileHeaderUnitTests
+  public class EndOfCentralDirectoryLocatorTests
   {
-    public LocalFileHeaderUnitTests()
+    public EndOfCentralDirectoryLocatorTests()
     {
+      //
+      // TODO: Add constructor logic here
+      //
     }
 
     private TestContext testContextInstance;
@@ -60,18 +63,17 @@ namespace ZipParserUnitTests.Model
     [TestMethod]
     public void ReadFromStream()
     {
-      var localFileHeader = new LocalFileHeader();
+      var endOfCentralDirectoryLocator = new EndOfCentralDirectoryLocator();
       bool success = false;
       using (var memoryStream = new MemoryStream(Properties.Resources.work_sample_exercise))
       using (var binaryReader = new BinaryReader(memoryStream))
       {
-        success = localFileHeader.ReadFromStream(binaryReader);
+        success = endOfCentralDirectoryLocator.ReadFromStream(binaryReader);
       }
 
-      Assert.IsTrue(!string.IsNullOrWhiteSpace(localFileHeader.GetFilename()));
-      Assert.IsFalse(localFileHeader.HasDataDescriptor);
-
-      Assert.IsTrue(success);
+      // This archive doesn't have a locator record
+      // Ideally an archive which has one would be used for this test
+      Assert.IsFalse(success);
     }
   }
 }
