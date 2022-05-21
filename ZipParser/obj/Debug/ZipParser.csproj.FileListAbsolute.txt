@@ -5,3 +5,4 @@ X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.csproj.SuggestedBindingRedirec
 X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.csproj.CoreCompileInputs.cache
 X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.exe
 X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.pdb
+X:\github\ZipParser\ZipParser\obj\Debug\ZipParser.csproj.AssemblyReference.cache

@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\CentralDirectoryFileHeader.cs" />
+    <Compile Include="Model\EndOfCentralDirectoryLocator.cs" />
+    <Compile Include="Model\EndOfCentralDirectoryRecord.cs" />
     <Compile Include="Model\LocalFileHeader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

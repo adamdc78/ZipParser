@@ -11,9 +11,9 @@ namespace ZipParserUnitTests.Model
   /// Summary description for UnitTest1
   /// </summary>
   [TestClass]
-  public class LocalFileHeaderUnitTests
+  public class LocalFileHeaderTests
   {
-    public LocalFileHeaderUnitTests()
+    public LocalFileHeaderTests()
     {
     }
 

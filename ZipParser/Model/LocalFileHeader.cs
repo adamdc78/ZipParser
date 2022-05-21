@@ -57,7 +57,8 @@ namespace ZipParser.Model
       PPMdvIR1 = 98,
     }
 
-    internal byte[] Signature { get; private set; }
+    static internal readonly byte[] Signature = BitConverter.GetBytes(0x04034b50);
+
     internal byte[] VersionNeededToExtract { get; private set; }
     internal byte[] GeneralPurposeBitFlag { get; private set; }
     internal byte[] CompressionMethod { get; private set; }
@@ -71,7 +72,7 @@ namespace ZipParser.Model
     internal byte[] FileName { get; private set; }
     internal byte[] ExtraField { get; private set; }
 
-    internal bool HasDataDescriptor { get { return BinaryUtilities.IsBitSet(GeneralPurposeBitFlag[0], (int)Flags.DataDescriptor); } }
+    internal bool HasDataDescriptor { get { return BinaryUtilities.IsBitSet(GeneralPurposeBitFlag, (int)Flags.DataDescriptor); } }
 
     internal LocalFileHeader(BinaryReader reader)
     {
@@ -88,7 +89,6 @@ namespace ZipParser.Model
 
       try
       {
-        Signature = reader.ReadBytes(4);
         VersionNeededToExtract = reader.ReadBytes(2);
         GeneralPurposeBitFlag = reader.ReadBytes(2);
         CompressionMethod = reader.ReadBytes(2);
@@ -104,13 +104,15 @@ namespace ZipParser.Model
         var extraFieldLength = BitConverter.ToInt16(ExtraFieldLength, 0);
 
         FileName = reader.ReadBytes(fileNameLength);
-        ExtraField = reader.ReadBytes(extraFieldLength);
+        if (extraFieldLength > 0)
+          ExtraField = reader.ReadBytes(extraFieldLength);
 
         success = true;
       }
       catch (Exception e)
       {
         Console.WriteLine($"Unable to read zip local file header: {e.Message}");
+        Console.WriteLine(e.StackTrace);
       }
 
       return success;
